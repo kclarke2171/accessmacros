@@ -1,0 +1,37 @@
+ONERROR
+  Go To: Next
+IF [Form].[Dirty] THEN
+  RUNMENUCOMMAND
+    Command: SaveRecord
+END IF
+IF [MacroError].[Number]<>0 THEN
+  MESSAGEBOX
+    Message: =[MacroError].[Description]
+    Beep: Yes
+    Type: None
+STOPMACRO
+END IF
+ONERROR
+  Go To: Fail
+OPENFORM
+  Form Name: * choose *
+  View: * choose * i.e. 'Form'
+  Where Condition: ="[ID]=" & Nz([ID],0)
+  Window Mode: Dialog
+IF Not IsNull([ID]) THEN
+  SETTEMPVAR
+    Name: CurrentID
+    Expression: [ID]
+END IF
+IF IsNull([ID]) THEN
+  SETTEMPVAR
+    Name: CurrentID
+    Expression: Nz(DMax("[ID]",[Form].[RecordSource]),0)
+END IF
+REQUERY
+  Control Name: (blank)  
+SEARCHFORRECORD
+  Record: First
+  Where Condition: ="[ID]=" & [TempVars]![CurrentID]
+REMOVETEMPVAR
+  Name: CurrentID
